@@ -1,17 +1,24 @@
 'use client'
-import { Root} from '@/types/WeatherAPIResponse'
+import { Root } from '@/types/WeatherAPIResponse'
 import fetchWeatherAPI from '../app/api/fetchWeatherAPI'
-import { useState } from "react"
-import { AiOutlineSearch } from "react-icons/ai"
+import { useState } from 'react'
+import { AiOutlineSearch } from 'react-icons/ai'
 import CurrentForecastCard from './CurrentForecastCard'
 
 export default function Form() {
     const [region, setRegion] = useState<string>('')
-    const [data, setData] = useState<Root>()
+    const [data, setData] = useState<Root | undefined>(undefined)
+    const [error, setError] = useState<string>('')
 
     async function fetchData(region: string) {
-        const data = await fetchWeatherAPI(region)
-        setData(data)
+        try {
+            const data = await fetchWeatherAPI(region)
+            setData(data)
+            setError('')
+        } catch (error) {
+            setError('Cidade não encontrada.')
+            setData(undefined)
+        }
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,13 +42,18 @@ export default function Form() {
                 </form>
             </section>
 
-            {data ? <CurrentForecastCard data={data} />
-                : <div className='flex flex-col items-center mt-10 text-xl text-white'>
+            {data ? (
+                <CurrentForecastCard data={data}/>
+            ) : error ? (
+                <div className='flex justify-center mt-10 text-xl text-white'>
+                    <p>{error}</p>
+                </div>
+            ) : (
+                <div className='flex flex-col items-center mt-10 text-xl text-white'>
                     <p>Bem Vindo ao Weather App!</p>
                     <p>Informe uma cidade para verificar a previsão do tempo.</p>
-                  </div>
-            }
-
+                </div>
+            )}
         </>
     )
 }
