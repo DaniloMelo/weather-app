@@ -1,4 +1,4 @@
-import { Root, Current } from "@/types/WeatherAPIResponse"
+import { Root } from "@/types/WeatherAPIResponse"
 
 
 export default async function GET(region: string): Promise<Root> {
